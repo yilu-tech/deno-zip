@@ -1,6 +1,7 @@
 import { exists, join } from "./deps.ts";
 interface CompressOptions {
   overwrite?: boolean;
+  cwd?: string;
 }
 const compressProcess = async (
   files: string | string[],
@@ -8,14 +9,14 @@ const compressProcess = async (
   options?: CompressOptions,
 ): Promise<boolean> => {
   if (await exists(archiveName) && !(options?.overwrite)) {
-    throw `The archive file ${
-      join(Deno.cwd(), archiveName)
+    throw `The archive file ${join(Deno.cwd(), archiveName)
     }.zip already exists, Use the {overwrite: true} option to overwrite the existing archive file`;
   }
   const filesList = typeof files === "string"
     ? files
     : files.join(Deno.build.os === "windows" ? ", " : " ");
   const compressCommandProcess = Deno.run({
+    cwd: options?.cwd,
     cmd: Deno.build.os === "windows"
       ? [
         "PowerShell",
